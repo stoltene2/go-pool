@@ -1,9 +1,10 @@
 package pool
 
 import (
+	"errors"
 	"io"
 	"sync"
-	"errors"
+	"log"
 )
 
 type Pool struct {
@@ -26,17 +27,24 @@ func New(fn func() (io.Closer, error), size uint) (*Pool, error) {
 	}, nil
 }
 
-// Acquire a resource from the existing pool or create a new one
+// Acquire a resource from the existing pool or create a new one If
+// there is an item available in the resource pool, use that
+// one. Otherwise create a new resource.
+// If the resource pool is closed we'll get ErrPoolClosed
 func (p *Pool) Acquire() (io.Closer, error) {
 	return nil, nil
 }
 
-// Release a resource back into a pool or close it
+// Release a resource back into a pool or close it.  This function is
+// protected by a mutex with closing.  If there are more slots
+// available in the resource pool it is inserted back in the
+// queue. Otherwise the resource is closed.
 func (p *Pool) Release(r io.Closer) {
 
 }
 
-// Close the pool down
+// Close the pool down.  Sets the closes the pool, set the state to
+// closed inside the pool struct, and closes each resource.
 func (p *Pool) Close() {
 
 }
